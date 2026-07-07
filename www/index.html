@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Contact Cleaner</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <h1>📇 Contact Cleaner</h1>
+    <p id="totalCount" class="sub">Scan karke shuru karo</p>
+  </header>
+
+  <!-- HOME / SCAN SCREEN -->
+  <div id="homeScreen" class="screen">
+    <button id="scanBtn" class="primary-btn">Scan Contacts</button>
+    <div id="loading" class="loading hidden">Scanning...</div>
+
+    <div id="summaryCards" class="summary-cards hidden">
+      <div class="card dup" data-target="duplicates">
+        <div class="card-icon">🔴</div>
+        <div class="card-info">
+          <div class="card-title">Duplicates</div>
+          <div class="card-count" id="dupCount">0</div>
+        </div>
+        <div class="chevron">›</div>
+      </div>
+
+      <div class="card invalid" data-target="invalid">
+        <div class="card-icon">🟠</div>
+        <div class="card-info">
+          <div class="card-title">Invalid / Incomplete</div>
+          <div class="card-count" id="invalidCount">0</div>
+        </div>
+        <div class="chevron">›</div>
+      </div>
+
+      <div class="card noname" data-target="noname">
+        <div class="card-icon">⚪</div>
+        <div class="card-info">
+          <div class="card-title">No Name</div>
+          <div class="card-count" id="nonameCount">0</div>
+        </div>
+        <div class="chevron">›</div>
+      </div>
+
+      <div class="card unused" data-target="unused">
+        <div class="card-icon">💤</div>
+        <div class="card-info">
+          <div class="card-title">Likely Unused</div>
+          <div class="card-count" id="unusedCount">0</div>
+        </div>
+        <div class="chevron">›</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIST SCREEN -->
+  <div id="listScreen" class="screen hidden">
+    <div class="list-header">
+      <button id="backBtn" class="back-btn">‹ Back</button>
+      <span id="listTitle" class="list-title"></span>
+      <button id="selectAllBtn" class="select-all-btn">Select All</button>
+    </div>
+    <div id="contactList" class="contact-list"></div>
+    <div class="action-bar hidden" id="actionBar">
+      <span id="selectedCount">0 selected</span>
+      <button id="deleteBtn" class="danger-btn">Delete Selected</button>
+    </div>
+  </div>
+
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

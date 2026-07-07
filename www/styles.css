@@ -1,0 +1,195 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, Roboto, Arial, sans-serif;
+  background: #f4f6f8;
+  color: #1a1a1a;
+  overscroll-behavior: none;
+}
+
+#app {
+  min-height: 100vh;
+  padding-bottom: 20px;
+}
+
+.header {
+  background: #14614f;
+  color: white;
+  padding: 24px 20px 20px;
+}
+
+.header h1 {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.sub {
+  font-size: 13px;
+  opacity: 0.85;
+  margin-top: 4px;
+}
+
+.screen {
+  padding: 16px;
+}
+
+.hidden { display: none !important; }
+
+.primary-btn {
+  width: 100%;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  background: #14614f;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  margin: 16px 0;
+}
+
+.primary-btn:active { opacity: 0.85; }
+
+.loading {
+  text-align: center;
+  color: #666;
+  padding: 20px;
+  font-size: 14px;
+}
+
+.summary-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.card-icon {
+  font-size: 22px;
+  margin-right: 14px;
+}
+
+.card-info {
+  flex: 1;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.card-count {
+  font-size: 13px;
+  color: #777;
+  margin-top: 2px;
+}
+
+.chevron {
+  font-size: 22px;
+  color: #ccc;
+}
+
+/* LIST SCREEN */
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 4px 16px;
+}
+
+.back-btn, .select-all-btn {
+  background: none;
+  border: none;
+  color: #14614f;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px;
+}
+
+.list-title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 80px;
+}
+
+.contact-item {
+  background: white;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.contact-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.contact-name {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.contact-nums {
+  font-size: 13px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.contact-reason {
+  display: inline-block;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  margin-top: 4px;
+  background: #ffe9e0;
+  color: #b3400f;
+}
+
+.empty-state {
+  text-align: center;
+  color: #888;
+  padding: 40px 20px;
+  font-size: 14px;
+}
+
+.action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid #eee;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+}
+
+.danger-btn {
+  background: #d32f2f;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+}
