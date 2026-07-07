@@ -1,0 +1,23 @@
+diff --git a/node_modules/@capacitor-community/contacts/android/src/main/java/getcapacitor/community/contacts/Contacts.java b/node_modules/@capacitor-community/contacts/android/src/main/java/getcapacitor/community/contacts/Contacts.java
+index 4f47239..8af5e0e 100644
+--- a/node_modules/@capacitor-community/contacts/android/src/main/java/getcapacitor/community/contacts/Contacts.java
++++ b/node_modules/@capacitor-community/contacts/android/src/main/java/getcapacitor/community/contacts/Contacts.java
+@@ -325,7 +325,7 @@ public class Contacts {
+                 }
+             }
+         } catch (Exception e) {
+-            // @TODO: we might want to throw an error somehow
++            throw new RuntimeException("createContact native error: " + e.getClass().getSimpleName() + ": " + e.getMessage(), e);
+         }
+ 
+         return null;
+@@ -340,8 +340,7 @@ public class Contacts {
+             int deleted = cr.delete(uri, null, null);
+             return deleted > 0;
+         } catch (Exception e) {
+-            // Something went wrong
+-            return false;
++            throw new RuntimeException("deleteContact native error: " + e.getClass().getSimpleName() + ": " + e.getMessage(), e);
+         }
+     }
+ 
