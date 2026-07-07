@@ -193,3 +193,45 @@ body {
   font-weight: 600;
   font-size: 14px;
 }
+
+/* DUPLICATE GROUPS */
+.merge-all-wrap {
+  margin-bottom: 10px;
+}
+
+.group-card {
+  background: white;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  border-left: 4px solid #e63946;
+}
+
+.group-header {
+  font-size: 12px;
+  font-weight: 700;
+  color: #b00020;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.group-entry {
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.group-entry:last-of-type {
+  border-bottom: none;
+}
+
+.merge-btn {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  background: #14614f;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+}

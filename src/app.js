@@ -10,6 +10,7 @@ import { Contacts } from '@capacitor-community/contacts';
 
 let allContacts = [];
 let categorized = { duplicates: [], invalid: [], noname: [], unused: [] };
+let duplicateGroups = [];
 let currentCategory = null;
 let selectedIds = new Set();
 
@@ -110,6 +111,39 @@ function categorize() {
       categorized.unused.push(c);
     }
   });
+
+  buildDuplicateGroups(numberMap);
+}
+
+function buildDuplicateGroups(numberMap) {
+  // Union-Find to group contacts that share any phone number
+  const parent = {};
+  function find(id) {
+    if (!(id in parent)) parent[id] = id;
+    if (parent[id] !== id) parent[id] = find(parent[id]);
+    return parent[id];
+  }
+  function union(a, b) {
+    const ra = find(a), rb = find(b);
+    if (ra !== rb) parent[ra] = rb;
+  }
+
+  allContacts.forEach(c => { find(c.contactId); });
+
+  Object.values(numberMap).forEach(ids => {
+    if (ids.length > 1) {
+      for (let i = 1; i < ids.length; i++) union(ids[0], ids[i]);
+    }
+  });
+
+  const groups = {};
+  allContacts.forEach(c => {
+    const root = find(c.contactId);
+    if (!groups[root]) groups[root] = [];
+    groups[root].push(c);
+  });
+
+  duplicateGroups = Object.values(groups).filter(g => g.length > 1);
 }
 
 function renderSummary() {
@@ -131,6 +165,12 @@ function openCategory(cat) {
   };
   listTitle.textContent = titles[cat];
 
+  if (cat === 'duplicates') {
+    selectAllBtn.classList.add('hidden');
+  } else {
+    selectAllBtn.classList.remove('hidden');
+  }
+
   homeScreen.classList.add('hidden');
   listScreen.classList.remove('hidden');
 
@@ -138,8 +178,14 @@ function openCategory(cat) {
 }
 
 function renderList() {
+  if (currentCategory === 'duplicates') {
+    renderDuplicateGroups();
+    return;
+  }
+
   const items = categorized[currentCategory] || [];
   contactList.innerHTML = '';
+  actionBar.classList.remove('merge-mode');
 
   if (items.length === 0) {
     contactList.innerHTML = '<div class="empty-state">Koi contact nahi mila is category me 🎉</div>';
@@ -170,6 +216,136 @@ function renderList() {
   });
 
   updateActionBar();
+}
+
+function renderDuplicateGroups() {
+  contactList.innerHTML = '';
+  actionBar.classList.add('hidden');
+
+  if (duplicateGroups.length === 0) {
+    contactList.innerHTML = '<div class="empty-state">Koi duplicate nahi mila 🎉</div>';
+    return;
+  }
+
+  duplicateGroups.forEach((group, idx) => {
+    const div = document.createElement('div');
+    div.className = 'group-card';
+
+    const entriesHtml = group.map(c => {
+      const name = (c.name && c.name.display) ? c.name.display : '(No Name)';
+      const nums = (c.phones || []).map(p => p.number).join(', ') || '(No Number)';
+      return `<div class="group-entry"><div class="contact-name">${name}</div><div class="contact-nums">${nums}</div></div>`;
+    }).join('');
+
+    div.innerHTML = `
+      <div class="group-header">${group.length} entries — same number</div>
+      ${entriesHtml}
+      <button class="merge-btn" data-group="${idx}">Merge into one</button>
+    `;
+
+    div.querySelector('.merge-btn').addEventListener('click', () => mergeGroup(idx));
+    contactList.appendChild(div);
+  });
+
+  const mergeAllWrap = document.createElement('div');
+  mergeAllWrap.className = 'merge-all-wrap';
+  mergeAllWrap.innerHTML = `<button id="mergeAllBtn" class="primary-btn">Merge All ${duplicateGroups.length} Groups</button>`;
+  contactList.prepend(mergeAllWrap);
+  document.getElementById('mergeAllBtn').addEventListener('click', mergeAllGroups);
+}
+
+function buildMergedContactInput(group) {
+  // Pick best name: longest non-empty display name
+  let bestName = '';
+  group.forEach(c => {
+    const dn = (c.name && c.name.display) ? c.name.display.trim() : '';
+    if (dn.length > bestName.length) bestName = dn;
+  });
+
+  // Collect unique phone numbers (by normalized value, keep original format)
+  const seenNums = new Set();
+  const phones = [];
+  group.forEach(c => {
+    (c.phones || []).forEach(p => {
+      const clean = normalizeNumber(p.number);
+      const key = clean || p.number;
+      if (key && !seenNums.has(key)) {
+        seenNums.add(key);
+        phones.push({ type: 'mobile', number: p.number, isPrimary: phones.length === 0 });
+      }
+    });
+  });
+
+  // Collect unique emails
+  const seenEmails = new Set();
+  const emails = [];
+  group.forEach(c => {
+    (c.emails || []).forEach(e => {
+      const key = (e.address || '').toLowerCase();
+      if (key && !seenEmails.has(key)) {
+        seenEmails.add(key);
+        emails.push({ type: 'home', address: e.address, isPrimary: emails.length === 0 });
+      }
+    });
+  });
+
+  return {
+    name: bestName ? { given: bestName } : undefined,
+    phones,
+    emails
+  };
+}
+
+async function mergeGroup(idx) {
+  const group = duplicateGroups[idx];
+  if (!group) return;
+
+  const confirmed = confirm(`${group.length} contacts ko ek me merge karein? Purane entries delete ho jayenge.`);
+  if (!confirmed) return;
+
+  try {
+    const contactInput = buildMergedContactInput(group);
+    await Contacts.createContact({ contact: contactInput });
+
+    for (const c of group) {
+      await Contacts.deleteContact({ contactId: c.contactId });
+    }
+
+    const idsToRemove = new Set(group.map(c => c.contactId));
+    allContacts = allContacts.filter(c => !idsToRemove.has(c.contactId));
+
+    categorize();
+    renderSummary();
+    renderList();
+    totalCount.textContent = `${allContacts.length} contacts scanned`;
+  } catch (err) {
+    alert('Merge error: ' + err.message);
+  }
+}
+
+async function mergeAllGroups() {
+  const confirmed = confirm(`${duplicateGroups.length} groups merge karni hai? Ye process thoda time lega, beech me app band mat karna.`);
+  if (!confirmed) return;
+
+  try {
+    for (const group of duplicateGroups.slice()) {
+      const contactInput = buildMergedContactInput(group);
+      await Contacts.createContact({ contact: contactInput });
+      for (const c of group) {
+        await Contacts.deleteContact({ contactId: c.contactId });
+      }
+      const idsToRemove = new Set(group.map(c => c.contactId));
+      allContacts = allContacts.filter(c => !idsToRemove.has(c.contactId));
+    }
+
+    categorize();
+    renderSummary();
+    renderList();
+    totalCount.textContent = `${allContacts.length} contacts scanned`;
+    alert('Sab groups merge ho gaye!');
+  } catch (err) {
+    alert('Merge error: ' + err.message);
+  }
 }
 
 function updateActionBar() {
