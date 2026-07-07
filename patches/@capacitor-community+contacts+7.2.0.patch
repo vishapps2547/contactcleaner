@@ -1,8 +1,19 @@
 diff --git a/node_modules/@capacitor-community/contacts/android/src/main/java/getcapacitor/community/contacts/Contacts.java b/node_modules/@capacitor-community/contacts/android/src/main/java/getcapacitor/community/contacts/Contacts.java
-index 4f47239..8af5e0e 100644
+index 4f47239..6bb906d 100644
 --- a/node_modules/@capacitor-community/contacts/android/src/main/java/getcapacitor/community/contacts/Contacts.java
 +++ b/node_modules/@capacitor-community/contacts/android/src/main/java/getcapacitor/community/contacts/Contacts.java
-@@ -325,7 +325,7 @@ public class Contacts {
+@@ -174,9 +174,7 @@ public class Contacts {
+ 
+     public String createContact(CreateContactInput contactInput) {
+         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
+-        ContentProviderOperation.Builder op = ContentProviderOperation.newInsert(RawContacts.CONTENT_URI)
+-            .withValue(RawContacts.ACCOUNT_TYPE, null)
+-            .withValue(RawContacts.ACCOUNT_NAME, null);
++        ContentProviderOperation.Builder op = ContentProviderOperation.newInsert(RawContacts.CONTENT_URI);
+         ops.add(op.build());
+ 
+         // Name
+@@ -325,7 +323,7 @@ public class Contacts {
                  }
              }
          } catch (Exception e) {
@@ -11,7 +22,7 @@ index 4f47239..8af5e0e 100644
          }
  
          return null;
-@@ -340,8 +340,7 @@ public class Contacts {
+@@ -340,8 +338,7 @@ public class Contacts {
              int deleted = cr.delete(uri, null, null);
              return deleted > 0;
          } catch (Exception e) {
