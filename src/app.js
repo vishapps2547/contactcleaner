@@ -307,17 +307,29 @@ async function mergeGroup(idx) {
     const contactInput = buildMergedContactInput(group);
     await Contacts.createContact({ contact: contactInput });
 
+    const failed = [];
+    const deletedIds = [];
     for (const c of group) {
-      await Contacts.deleteContact({ contactId: c.contactId });
+      try {
+        await Contacts.deleteContact({ contactId: c.contactId });
+        deletedIds.push(c.contactId);
+      } catch (delErr) {
+        failed.push(c);
+      }
     }
 
-    const idsToRemove = new Set(group.map(c => c.contactId));
+    const idsToRemove = new Set(deletedIds);
     allContacts = allContacts.filter(c => !idsToRemove.has(c.contactId));
 
     categorize();
     renderSummary();
     renderList();
     totalCount.textContent = `${allContacts.length} contacts scanned`;
+
+    if (failed.length > 0) {
+      const names = failed.map(c => (c.name && c.name.display) ? c.name.display : '(No Name)').join(', ');
+      alert(`Naya contact ban gaya, lekin ${failed.length} purani entry delete nahi ho payi (shayad SIM card pe hai): ${names}. Inhe manually delete karna padega.`);
+    }
   } catch (err) {
     alert('Merge error: ' + err.message);
   }
@@ -327,14 +339,23 @@ async function mergeAllGroups() {
   const confirmed = confirm(`${duplicateGroups.length} groups merge karni hai? Ye process thoda time lega, beech me app band mat karna.`);
   if (!confirmed) return;
 
+  let failedTotal = 0;
+
   try {
     for (const group of duplicateGroups.slice()) {
       const contactInput = buildMergedContactInput(group);
       await Contacts.createContact({ contact: contactInput });
+
+      const deletedIds = [];
       for (const c of group) {
-        await Contacts.deleteContact({ contactId: c.contactId });
+        try {
+          await Contacts.deleteContact({ contactId: c.contactId });
+          deletedIds.push(c.contactId);
+        } catch (delErr) {
+          failedTotal++;
+        }
       }
-      const idsToRemove = new Set(group.map(c => c.contactId));
+      const idsToRemove = new Set(deletedIds);
       allContacts = allContacts.filter(c => !idsToRemove.has(c.contactId));
     }
 
@@ -342,7 +363,12 @@ async function mergeAllGroups() {
     renderSummary();
     renderList();
     totalCount.textContent = `${allContacts.length} contacts scanned`;
-    alert('Sab groups merge ho gaye!');
+
+    if (failedTotal > 0) {
+      alert(`Merge complete. ${failedTotal} purani entries delete nahi ho payi (shayad SIM card pe hai) — unhe manually delete karna padega.`);
+    } else {
+      alert('Sab groups merge ho gaye!');
+    }
   } catch (err) {
     alert('Merge error: ' + err.message);
   }
