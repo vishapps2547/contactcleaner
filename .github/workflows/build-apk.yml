@@ -32,6 +32,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Build web bundle
+        run: npm run build
+
       - name: Sync Capacitor
         run: npx cap sync android
 

@@ -1,3 +1,11 @@
+window.addEventListener('error', (e) => {
+  alert('JS Error: ' + e.message + '\n' + (e.filename || '') + ':' + (e.lineno || ''));
+});
+window.addEventListener('unhandledrejection', (e) => {
+  const msg = (e.reason && e.reason.message) ? e.reason.message : String(e.reason);
+  alert('Promise Error: ' + msg);
+});
+
 import { Contacts } from '@capacitor-community/contacts';
 
 let allContacts = [];

@@ -5,3 +5,4 @@ android/.gradle/
 android/local.properties
 *.log
 .DS_Store
+www/app.js
