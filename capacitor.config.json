@@ -1,0 +1,6 @@
+{
+  "appId": "com.vishapps.contactcleaner",
+  "appName": "Contact Cleaner",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
